@@ -47,7 +47,15 @@ pydrizzle-orm generate
 
 This writes `.pydrizzle/schema.ts` and `.pydrizzle/drizzle.config.ts`.
 
-## 5. Apply to your database
+## 5. Create migration files
+
+```bash
+pydrizzle-orm migrate
+```
+
+This generates versioned SQL migration files you can review, commit, and apply consistently across environments.
+
+## 6. Apply migrations
 
 ```bash
 export DATABASE_URL=postgresql://user:pass@localhost:5432/mydb
@@ -56,13 +64,13 @@ pydrizzle-orm push
 
 That's it — your table is live.
 
-To create versioned migration files instead of pushing directly:
+> **Warning:** `pydrizzle-orm push` applies the schema directly without migration files.
+> This is convenient for local development and prototyping, but **always use
+> `pydrizzle-orm migrate` to generate versioned migration files** for staging and
+> production. Versioned migrations are the whole point — they give you a reviewable,
+> repeatable, rollback-friendly history of every schema change.
 
-```bash
-pydrizzle-orm migrate
-```
-
-## 6. Check everything is wired up
+## 7. Check everything is wired up
 
 ```bash
 pydrizzle-orm status

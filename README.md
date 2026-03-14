@@ -19,7 +19,8 @@
 pip install pydrizzle-orm
 pydrizzle-orm init        # scaffold config + starter schema
 pydrizzle-orm generate    # emit Drizzle .ts files
-pydrizzle-orm push        # apply to your database
+pydrizzle-orm migrate     # create versioned migration files
+pydrizzle-orm push        # apply migrations to your database
 ```
 
 See the [quickstart guide](docs/quickstart.md) for the full walkthrough.
