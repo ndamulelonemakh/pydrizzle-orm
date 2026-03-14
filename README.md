@@ -1,4 +1,4 @@
-# pydrizzle-orm
+# pydrizzle-orm [WIP]
 
 **Python migrations powered by Drizzle** — define your database schema in Python, generate and apply migrations using [drizzle-kit](https://orm.drizzle.team/kit-docs/overview) under the hood.
 
@@ -61,11 +61,6 @@ Current implementation status:
 - `pydrizzle`: available
 - `sqlalchemy`: available
 - `typescript`: available
-
-## Roadmap
-
-- Evaluate replacing the hand-rolled TOML config layer with `pydantic-settings` if the config surface keeps growing.
-- Explore an AI-assisted generation path that uses a coding model such as GPT Codex instead of relying only on manual schema generation flows.
 
 ## Requirements
 
@@ -160,6 +155,18 @@ Release details are in [docs/releasing.md](docs/releasing.md).
 ## Status
 
 Alpha. API may change. PostgreSQL support only.
+
+
+## Roadmap
+
+- [ ] **MySQL and SQLite dialects** — extend beyond PostgreSQL.
+
+- [ ] **Rollback generation** — produce a down-migration alongside each up-migration for safer deployments.
+
+- [ ] **Pre-commit hook** — run `generate` and `migrate` automatically on commit so migration drift never reaches the remote branch.
+
+- [ ] **`pydrizzle-orm[ai]`** — optional extra that uses Claude to translate SQLAlchemy models (or raw DDL) into Drizzle-compatible schema files, reducing manual conversion work.
+
 
 ## License
 
