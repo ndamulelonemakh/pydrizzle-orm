@@ -1,0 +1,76 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pydrizzle-orm"
+version = "0.1.0"
+description = "Python migrations powered by Drizzle — define schemas in Python, generate migrations with drizzle-kit."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    { name = "Ndamulelo Nemakhavhani" },
+]
+dependencies = []
+keywords = ["database", "migrations", "drizzle", "postgresql", "schema"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Database",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/ndamulelonemakh/pydrizzle"
+Repository = "https://github.com/ndamulelonemakh/pydrizzle"
+Issues = "https://github.com/ndamulelonemakh/pydrizzle/issues"
+Documentation = "https://github.com/ndamulelonemakh/pydrizzle/tree/main/docs"
+
+[project.optional-dependencies]
+sqlalchemy = ["sqlalchemy>=2.0"]
+
+[dependency-groups]
+dev = [
+    "fastapi>=0.115",
+    "httpx>=0.27",
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.4",
+    "psycopg[binary]>=3.2",
+    "testcontainers>=4.9",
+    "pre-commit>=4.5.1",
+]
+
+[project.scripts]
+pydrizzle-orm = "pydrizzle_orm.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pydrizzle_orm"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["E501"]  # line length handled by formatter
+
+[tool.ruff.lint.isort]
+known-first-party = ["pydrizzle_orm"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "e2e: end-to-end tests that require Docker and a JavaScript runtime",
+]

@@ -1,0 +1,21 @@
+[pydrizzle]
+dialect = "postgresql"
+database_url_env = "DATABASE_URL"
+migrations_dir = "migrations"
+out_dir = ".pydrizzle"
+schema_filter = ["public"]
+
+[pydrizzle.modes.native]
+schema = "schemas/native_schema.py"
+schema_type = "pydrizzle"
+
+[pydrizzle.modes.sqlalchemy]
+schema = "schemas/sqlalchemy_models.py"
+schema_type = "sqlalchemy"
+out_dir = ".pydrizzle-sqlalchemy"
+
+[pydrizzle.modes.typescript]
+schema = "schemas/typescript_schema.ts"
+schema_type = "typescript"
+out_dir = ".pydrizzle-typescript"
+

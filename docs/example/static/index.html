@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pydrizzle-orm · interactive demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+            sans: ['Inter', 'ui-sans-serif', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    body { background: #0d1117; }
+    .hljs { background: transparent !important; padding: 0 !important; }
+    .code-scroll { overflow: auto; height: 100%; }
+    .code-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .code-scroll::-webkit-scrollbar-track { background: transparent; }
+    .code-scroll::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+    .mode-btn.active { background: #1f6feb; color: #e6edf3; border-color: #388bfd; }
+    .mode-btn { transition: all 0.15s ease; }
+    .badge { font-size: 11px; font-family: 'JetBrains Mono', monospace; }
+    .target-card.active { border-color: #388bfd; background: rgba(31, 111, 235, 0.12); }
+    pre { margin: 0; white-space: pre; }
+    code { font-size: 12.5px; line-height: 1.65; font-family: 'JetBrains Mono', monospace; }
+    #input-editor {
+      width: 100%; height: 100%; resize: none; border: none; outline: none;
+      background: #161b22; color: #e6edf3; padding: 1rem;
+      font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.65;
+      tab-size: 4;
+    }
+    .spin { animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="font-sans text-gray-200 min-h-screen">
+
+  <!-- header -->
+  <header class="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="text-lg font-semibold tracking-tight text-white font-mono">pydrizzle-orm</span>
+      <span class="badge bg-gray-800 text-gray-400 border border-gray-700 rounded px-2 py-0.5">v0.1.0</span>
+    </div>
+    <div class="text-sm text-gray-500">one manifest · multiple schema targets</div>
+    <a href="/api/docs" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 border border-indigo-800 hover:border-indigo-600 rounded px-3 py-1.5 transition-colors">
+      API docs ↗
+    </a>
+  </header>
+
+  <section class="px-6 pt-6">
+    <div class="border border-gray-800 rounded-lg bg-gray-900/80 overflow-hidden">
+      <div class="px-4 py-3 border-b border-gray-800 flex items-center justify-between gap-3">
+        <div>
+          <p class="text-xs text-gray-500 uppercase tracking-widest font-mono">manifest registry</p>
+          <p class="text-sm text-gray-300 mt-1">A single <span class="font-mono text-gray-200">pydrizzle.toml</span> describes every schema source and output target.</p>
+        </div>
+        <span id="registry-config" class="text-xs text-gray-600 font-mono"></span>
+      </div>
+      <div id="target-registry" class="grid grid-cols-1 md:grid-cols-3 gap-3 p-4"></div>
+    </div>
+  </section>
+
+  <!-- mode switcher -->
+  <div class="px-6 pt-6 pb-0">
+    <p class="text-xs text-gray-500 mb-3 uppercase tracking-widest font-mono">schema mode</p>
+    <div class="flex gap-2 flex-wrap">
+      <button
+        id="btn-native"
+        onclick="switchMode('native')"
+        class="mode-btn active border border-indigo-700 rounded-md px-4 py-2 text-sm font-mono text-gray-200 flex items-center gap-2"
+      >
+        <span class="text-yellow-400">🐍</span> Native Python
+      </button>
+      <button
+        id="btn-sqlalchemy"
+        onclick="switchMode('sqlalchemy')"
+        class="mode-btn border border-gray-700 rounded-md px-4 py-2 text-sm font-mono text-gray-400 flex items-center gap-2 hover:border-gray-600 hover:text-gray-200"
+      >
+        <span>🗄️</span> SQLAlchemy
+        <span class="badge bg-gray-800 text-gray-500 border border-gray-700 rounded px-1.5 py-0.5 ml-1">v0.2</span>
+      </button>
+      <button
+        id="btn-typescript"
+        onclick="switchMode('typescript')"
+        class="mode-btn border border-gray-700 rounded-md px-4 py-2 text-sm font-mono text-gray-400 flex items-center gap-2 hover:border-gray-600 hover:text-gray-200"
+      >
+        <span class="text-blue-400">TS</span> TypeScript direct
+      </button>
+    </div>
+
+    <!-- mode description -->
+    <div id="mode-desc" class="mt-4 text-sm text-gray-500 leading-relaxed max-w-2xl"></div>
+
+    <div class="mt-4 border border-gray-800 rounded-lg bg-gray-900/70 p-4">
+      <div class="flex flex-wrap items-center gap-3 justify-between">
+        <div>
+          <p class="text-xs text-gray-500 uppercase tracking-widest font-mono">database controls</p>
+          <p id="db-message" class="text-sm text-gray-300 mt-1">Test your database connection to enable push.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="db-state" class="badge bg-gray-800 text-gray-400 border border-gray-700 rounded px-2 py-0.5">not tested</span>
+          <button
+            id="db-test-btn"
+            onclick="testDbConnection()"
+            class="text-xs font-mono bg-gray-800 hover:bg-gray-700 text-gray-200 rounded px-3 py-1.5 transition-colors"
+          >
+            Test connection
+          </button>
+        </div>
+      </div>
+      <div class="mt-3">
+        <p class="text-xs text-gray-500 font-mono mb-1">public tables</p>
+        <div id="tables-list" class="text-xs font-mono text-gray-400 bg-gray-950/70 border border-gray-800 rounded px-3 py-2 min-h-[2.5rem]">
+          no tables loaded
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- main panes -->
+  <div class="px-6 pt-4 pb-6 grid grid-cols-1 lg:grid-cols-2 gap-4" style="min-height: 440px;">
+
+    <!-- left: schema input (editable) -->
+    <div class="flex flex-col border border-gray-800 rounded-lg overflow-hidden bg-gray-900">
+      <div class="flex items-center justify-between px-4 py-2.5 border-b border-gray-800 bg-gray-900 shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-gray-500 font-mono">schema definition</span>
+          <span id="input-lang-badge" class="badge bg-gray-800 text-gray-400 border border-gray-700 rounded px-2 py-0.5">Python</span>
+          <span class="badge bg-emerald-950 text-emerald-300 border border-emerald-800 rounded px-2 py-0.5">editable</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="resetSchema()" class="text-xs text-gray-500 hover:text-gray-300 font-mono transition-colors">↺ reset</button>
+          <span id="input-filename" class="text-xs text-gray-600 font-mono">native_schema.py</span>
+        </div>
+      </div>
+      <div class="flex-1" style="background: #161b22;">
+        <textarea id="input-editor" spellcheck="false"></textarea>
+      </div>
+    </div>
+
+    <!-- right: output -->
+    <div class="flex flex-col border border-gray-800 rounded-lg overflow-hidden bg-gray-900">
+      <div class="flex items-center justify-between px-4 py-2.5 border-b border-gray-800 bg-gray-900 shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-gray-500 font-mono">drizzle-orm output</span>
+          <span id="output-lang-badge" class="badge bg-blue-900 text-blue-300 border border-blue-800 rounded px-2 py-0.5">TypeScript</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="output-target" class="text-xs text-gray-600 font-mono"></span>
+          <span id="gen-stats" class="text-xs text-gray-600 font-mono"></span>
+          <button
+            id="push-btn"
+            onclick="runPush()"
+            class="text-xs font-mono bg-emerald-700 hover:bg-emerald-600 text-white rounded px-3 py-1.5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            disabled
+          >
+            Push
+          </button>
+          <button
+            id="gen-btn"
+            onclick="runGenerate()"
+            class="text-xs font-mono bg-indigo-700 hover:bg-indigo-600 text-white rounded px-3 py-1.5 transition-colors flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span id="gen-icon">⚡</span> Generate
+          </button>
+        </div>
+      </div>
+      <div id="output-body" class="code-scroll flex-1 p-4" style="background: #161b22;">
+        <pre><code id="output-code" class="language-typescript"></code></pre>
+      </div>
+      <!-- overlay for non-native modes -->
+      <div id="output-overlay" class="hidden absolute inset-0 flex items-center justify-center pointer-events-none"></div>
+    </div>
+
+  </div>
+
+  <!-- footer -->
+  <div class="px-6 pb-4 flex items-center gap-4 text-xs text-gray-600 font-mono">
+    <span>pip install pydrizzle-orm</span>
+    <span class="text-gray-700">·</span>
+    <a href="https://github.com/ndamulelonemakh/pydrizzle" target="_blank" class="hover:text-gray-400 transition-colors">github ↗</a>
+    <span class="text-gray-700">·</span>
+    <span id="status-line">loading manifest</span>
+  </div>
+
+<script>
+  const MODES = {
+    native: {
+      label: 'Native Python',
+      inputLang: 'Python',
+      inputFile: 'native_schema.py',
+      desc: 'Define your schema in pure Python using the pydrizzle-orm DSL. The demo can live-generate from the editor here and show the emitted drizzle-orm schema immediately.',
+      outputMode: 'generate',
+      editable: true,
+    },
+    sqlalchemy: {
+      label: 'SQLAlchemy',
+      inputLang: 'Python',
+      inputFile: 'sqlalchemy_models.py',
+      desc: 'Point pydrizzle-orm at SQLAlchemy 2.0 declarative models and it will introspect them into the shared IR before regenerating drizzle-orm output.',
+      outputMode: 'generate',
+      editable: false,
+    },
+    typescript: {
+      label: 'TypeScript direct',
+      inputLang: 'TypeScript',
+      inputFile: 'typescript_schema.ts',
+      desc: 'Register an existing drizzle-orm TypeScript schema and pydrizzle-orm will parse it into the same IR used by the Python and SQLAlchemy modes.',
+      outputMode: 'generate',
+      editable: false,
+    },
+  };
+
+  let currentMode = 'native';
+  let schemaCache = {};
+  let originalSource = {};
+  let registry = [];
+  let generatedByMode = {};
+  let dbStateByMode = {};
+
+  function setStatus(msg) {
+    document.getElementById('status-line').textContent = msg;
+  }
+
+  function highlight(el, lang) {
+    el.className = `language-${lang}`;
+    hljs.highlightElement(el);
+  }
+
+  function getDbState(mode = currentMode) {
+    return dbStateByMode[mode] || {
+      checked: false,
+      alive: false,
+      detail: 'not tested',
+      tables: [],
+      env: null,
+    };
+  }
+
+  function setDbState(mode, next) {
+    dbStateByMode[mode] = {
+      ...getDbState(mode),
+      ...next,
+    };
+  }
+
+  function renderDbState() {
+    const state = getDbState(currentMode);
+    const stateBadge = document.getElementById('db-state');
+    const message = document.getElementById('db-message');
+    const tables = document.getElementById('tables-list');
+    const pushBtn = document.getElementById('push-btn');
+
+    if (!state.checked) {
+      stateBadge.textContent = 'not tested';
+      stateBadge.className = 'badge bg-gray-800 text-gray-400 border border-gray-700 rounded px-2 py-0.5';
+      message.textContent = 'Test your database connection to enable push.';
+      tables.textContent = 'no tables loaded';
+    } else if (state.alive) {
+      stateBadge.textContent = 'connected';
+      stateBadge.className = 'badge bg-emerald-950 text-emerald-300 border border-emerald-800 rounded px-2 py-0.5';
+      message.textContent = state.env
+        ? `${state.detail} via ${state.env}`
+        : state.detail;
+      tables.textContent = state.tables.length
+        ? state.tables.join(', ')
+        : 'connected, no public tables yet';
+    } else {
+      stateBadge.textContent = 'offline';
+      stateBadge.className = 'badge bg-rose-950 text-rose-300 border border-rose-800 rounded px-2 py-0.5';
+      message.textContent = state.detail || 'database connection failed';
+      tables.textContent = 'no tables loaded';
+    }
+
+    pushBtn.disabled = !(state.alive && generatedByMode[currentMode]);
+  }
+
+  async function loadRegistry() {
+    const res = await fetch('/api/registry');
+    const data = await res.json();
+    registry = data.targets;
+    document.getElementById('registry-config').textContent = data.config;
+    renderRegistry();
+  }
+
+  function renderRegistry() {
+    const root = document.getElementById('target-registry');
+    root.innerHTML = '';
+
+    registry.forEach((target) => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'target-card text-left rounded-lg border border-gray-800 bg-gray-950/60 p-4 transition-colors hover:border-gray-700';
+      if (target.mode === currentMode) {
+        card.classList.add('active');
+      }
+      card.onclick = () => switchMode(target.mode);
+      card.innerHTML = `
+        <div class="flex items-center justify-between gap-3">
+          <span class="text-sm text-white font-mono">${target.mode}</span>
+          <span class="badge ${target.can_generate ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-gray-800 text-gray-400 border border-gray-700'} rounded px-2 py-0.5">${target.can_generate ? 'live' : 'planned'}</span>
+        </div>
+        <p class="mt-2 text-xs text-gray-500 font-mono">${target.schema_type}</p>
+        <p class="mt-3 text-xs text-gray-300">schema: <span class="font-mono text-gray-400">${target.schema}</span></p>
+        <p class="mt-1 text-xs text-gray-300">output: <span class="font-mono text-gray-400">${target.out_dir}</span></p>
+      `;
+      root.appendChild(card);
+    });
+  }
+
+  async function loadSchema(mode) {
+    if (schemaCache[mode]) return schemaCache[mode];
+    const res = await fetch(`/api/schema/${mode}`);
+    const data = await res.json();
+    schemaCache[mode] = data;
+    return data;
+  }
+
+  async function runGenerate() {
+    const btn = document.getElementById('gen-btn');
+    const icon = document.getElementById('gen-icon');
+    btn.disabled = true;
+    icon.innerHTML = '<span class="spin inline-block">↻</span>';
+    setStatus('generating…');
+
+    try {
+      const cfg = MODES[currentMode];
+      const res = cfg.editable
+        ? await fetch('/api/generate-from-source', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ source: document.getElementById('input-editor').value }),
+          })
+        : await fetch(`/api/generate/${currentMode}`, {
+            method: 'POST',
+          });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.detail || 'generation failed');
+      }
+      const data = await res.json();
+      const out = document.getElementById('output-code');
+      out.textContent = data.typescript;
+      highlight(out, 'typescript');
+      document.getElementById('gen-stats').textContent =
+        `${data.tables} tables · ${data.enums} enum${data.enums !== 1 ? 's' : ''}`;
+      generatedByMode[currentMode] = true;
+      renderDbState();
+      setStatus('generated ok');
+    } catch (e) {
+      document.getElementById('output-code').textContent = `// error: ${e.message}`;
+      setStatus('generation failed');
+    } finally {
+      btn.disabled = false;
+      icon.textContent = '⚡';
+    }
+  }
+
+  async function testDbConnection() {
+    const btn = document.getElementById('db-test-btn');
+    btn.disabled = true;
+    btn.textContent = 'Testing...';
+    try {
+      const res = await fetch(`/api/db/health?mode=${encodeURIComponent(currentMode)}`);
+      const data = await res.json();
+      setDbState(currentMode, {
+        checked: true,
+        alive: !!data.alive,
+        detail: data.detail,
+        tables: data.tables || [],
+        env: data.database_url_env || null,
+      });
+      renderDbState();
+      setStatus(data.alive ? 'database connected' : 'database unavailable');
+    } catch (e) {
+      setDbState(currentMode, {
+        checked: true,
+        alive: false,
+        detail: e.message,
+        tables: [],
+      });
+      renderDbState();
+      setStatus('database check failed');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Test connection';
+    }
+  }
+
+  async function runPush() {
+    const pushBtn = document.getElementById('push-btn');
+    const genBtn = document.getElementById('gen-btn');
+    pushBtn.disabled = true;
+    genBtn.disabled = true;
+    pushBtn.textContent = 'Pushing...';
+    setStatus('running drizzle-kit push...');
+
+    try {
+      const res = await fetch(`/api/push/${encodeURIComponent(currentMode)}`, { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || 'push failed');
+      }
+
+      setDbState(currentMode, {
+        checked: true,
+        alive: true,
+        detail: 'Push complete',
+        tables: data.tables || [],
+      });
+      renderDbState();
+      setStatus('push complete');
+    } catch (e) {
+      setDbState(currentMode, {
+        checked: true,
+        alive: false,
+        detail: e.message,
+      });
+      renderDbState();
+      setStatus('push failed');
+    } finally {
+      pushBtn.textContent = 'Push';
+      genBtn.disabled = false;
+      renderDbState();
+    }
+  }
+
+  function resetSchema() {
+    const src = originalSource[currentMode];
+    if (src) document.getElementById('input-editor').value = src;
+  }
+
+  async function switchMode(mode) {
+    currentMode = mode;
+    const cfg = MODES[mode];
+    renderRegistry();
+
+    // update tab buttons
+    ['native', 'sqlalchemy', 'typescript'].forEach(m => {
+      const b = document.getElementById(`btn-${m}`);
+      b.classList.toggle('active', m === mode);
+      b.classList.toggle('border-indigo-700', m === mode);
+      b.classList.toggle('text-gray-200', m === mode);
+      b.classList.toggle('border-gray-700', m !== mode);
+      b.classList.toggle('text-gray-400', m !== mode);
+    });
+
+    // update description
+    document.getElementById('mode-desc').textContent = cfg.desc;
+
+    // update left pane
+    document.getElementById('input-lang-badge').textContent = cfg.inputLang;
+    document.getElementById('input-filename').textContent = cfg.inputFile;
+    document.getElementById('output-target').textContent = '';
+
+    const editor = document.getElementById('input-editor');
+    editor.value = 'loading…';
+    editor.readOnly = !cfg.editable;
+    const payload = await loadSchema(mode);
+    editor.value = payload.source;
+    originalSource[mode] = payload.source;
+    if (generatedByMode[mode] === undefined) {
+      generatedByMode[mode] = false;
+    }
+
+    // update right pane
+    const genBtn = document.getElementById('gen-btn');
+    const outputCode = document.getElementById('output-code');
+    const stats = document.getElementById('gen-stats');
+
+    if (cfg.outputMode === 'generate') {
+      genBtn.style.display = '';
+      document.getElementById('output-target').textContent = payload.out_dir;
+      outputCode.textContent = cfg.editable
+        ? '// click ⚡ Generate to run pydrizzle-orm codegen live'
+        : '// click ⚡ Generate to parse this target and re-emit the drizzle-orm schema';
+      highlight(outputCode, 'typescript');
+      stats.textContent = '';
+    }
+
+    renderDbState();
+  }
+
+  // boot
+  document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('mode-desc').textContent = MODES.native.desc;
+    await loadRegistry();
+    switchMode('native');
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+[project]
+name = "pydrizzle-example"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydrizzle-orm>=0.1.0",
+    "sqlalchemy>=2.0.48",
+    "psycopg[binary,pool]>=3.3.3",
+]
+
+[tool.uv.sources]
+"pydrizzle-orm" = { path = "../..", editable = true }
+
+[project.scripts]
+dev = "app:dev"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
