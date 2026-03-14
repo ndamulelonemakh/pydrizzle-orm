@@ -15,28 +15,14 @@
 
 ## Quick Start
 
-Requirements:
-
-- Python 3.11+
-- Bun or Node.js on `PATH`
-- PostgreSQL database URL exposed as `DATABASE_URL`
-
 ```bash
-uv pip install pydrizzle-orm
-pydrizzle-orm init
-pydrizzle-orm generate
-pydrizzle-orm push
+pip install pydrizzle-orm
+pydrizzle-orm init        # scaffold config + starter schema
+pydrizzle-orm generate    # emit Drizzle .ts files
+pydrizzle-orm push        # apply to your database
 ```
 
-For SQLAlchemy model introspection, install the extra:
-
-```bash
-uv pip install 'pydrizzle-orm[sqlalchemy]'
-```
-
-If you want one config file to describe multiple schema sources, put them under `[pydrizzle.modes.*]`. `pydrizzle-orm generate` will process every configured entry, and `--mode <name>` can be used to target one entry.
-
-For a fuller setup walkthrough, see [docs/quickstart.md](docs/quickstart.md).
+See the [quickstart guide](docs/quickstart.md) for the full walkthrough.
 
 ## Define Your Schema
 
@@ -79,40 +65,6 @@ Current implementation status:
 
 - Evaluate replacing the hand-rolled TOML config layer with `pydantic-settings` if the config surface keeps growing.
 - Explore an AI-assisted generation path that uses a coding model such as GPT Codex instead of relying only on manual schema generation flows.
-
-Single-config entry registry:
-
-```toml
-[pydrizzle]
-dialect = "postgresql"
-database_url_env = "DATABASE_URL"
-out_dir = ".pydrizzle"
-
-[pydrizzle.modes.native]
-schema = "myapp.schemas"
-schema_type = "pydrizzle"
-
-[pydrizzle.modes.sqlalchemy]
-schema = "myapp.models"
-schema_type = "sqlalchemy"
-
-[pydrizzle.modes.typescript]
-schema = "src/db/schema"
-schema_type = "typescript"
-```
-
-Then run:
-
-```bash
-pydrizzle generate
-pydrizzle --mode sqlalchemy generate
-```
-
-For `sqlalchemy` targets, `schema` can be a Python file path, a dotted module name, or a package path. Package targets are walked recursively so split model layouts such as `myapp.models` work without re-exporting every model in one file.
-
-For `pydrizzle` targets, `schema` can also be a Python file path, a dotted module name, or a package path. Package targets are walked recursively so split schema layouts such as `myapp.schemas` work the same way.
-
-For `typescript` targets, `schema` can point at a single `.ts` schema file, an `index.ts` barrel that re-exports schema modules, or a directory of `.ts` schema files. Directory targets are walked recursively so split Drizzle layouts can stay distributed across subfolders.
 
 ## Requirements
 

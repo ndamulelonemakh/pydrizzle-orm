@@ -14,7 +14,7 @@ Configure publishers in both PyPI and TestPyPI before running the workflow.
 Create a trusted publisher for:
 
 - Owner: `ndamulelonemakh`
-- Repository: `pydrizzle`
+- Repository: `pydrizzle-orm`
 - Workflow name: `publish.yml`
 - Environment name: `pypi`
 
@@ -23,7 +23,7 @@ Create a trusted publisher for:
 Create a trusted publisher for:
 
 - Owner: `ndamulelonemakh`
-- Repository: `pydrizzle`
+- Repository: `pydrizzle-orm`
 - Workflow name: `publish.yml`
 - Environment name: `testpypi`
 

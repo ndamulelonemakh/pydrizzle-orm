@@ -1,42 +1,96 @@
 # Quickstart
 
-## Requirements
+Get a Python project using pydrizzle-orm migrations in under 5 minutes.
+
+## Prerequisites
 
 - Python 3.11+
-- Bun or Node.js available on `PATH`
-- PostgreSQL database URL in `DATABASE_URL`
+- [Bun](https://bun.sh) or [Node.js](https://nodejs.org) on your `PATH`
+- A running PostgreSQL instance
 
-## Install
-
-```bash
-uv pip install pydrizzle-orm
-```
-
-If you want to read SQLAlchemy models directly:
-
-```bash
-uv pip install 'pydrizzle-orm[sqlalchemy]'
-```
-
-Or with `pip`:
+## 1. Install
 
 ```bash
 pip install pydrizzle-orm
 ```
 
-## Bootstrap a project
+## 2. Scaffold
 
 ```bash
 pydrizzle-orm init
 ```
 
-This creates:
+This creates a `pydrizzle.toml` config and a starter `schema.py`.
 
-- `pydrizzle.toml`
-- `schema.py`
-- `.pydrizzle/` after generation
+## 3. Define your schema
 
-If you want one config file to describe multiple schema sources, add named entries under `[pydrizzle.modes.*]`:
+Edit `schema.py`:
+
+```python
+from pydrizzle_orm import pg_table, text, timestamp, uuid, index
+
+users = pg_table(
+    "users",
+    id=uuid().primary_key().default_random(),
+    email=text().not_null().unique(),
+    name=text().not_null(),
+    created_at=timestamp().default_now().not_null(),
+    indexes=[index("users_email_idx").on("email")],
+)
+```
+
+## 4. Generate Drizzle files
+
+```bash
+pydrizzle-orm generate
+```
+
+This writes `.pydrizzle/schema.ts` and `.pydrizzle/drizzle.config.ts`.
+
+## 5. Apply to your database
+
+```bash
+export DATABASE_URL=postgresql://user:pass@localhost:5432/mydb
+pydrizzle-orm push
+```
+
+That's it — your table is live.
+
+To create versioned migration files instead of pushing directly:
+
+```bash
+pydrizzle-orm migrate
+```
+
+## 6. Check everything is wired up
+
+```bash
+pydrizzle-orm status
+```
+
+---
+
+## Going further
+
+### SQLAlchemy model introspection
+
+If you already have SQLAlchemy models and want pydrizzle-orm to read them directly, install the extra:
+
+```bash
+pip install 'pydrizzle-orm[sqlalchemy]'
+```
+
+Then point your config at the models module:
+
+```toml
+[pydrizzle]
+schema = "myapp.models"
+schema_type = "sqlalchemy"
+```
+
+### Multiple schema sources
+
+A single config can describe several schema inputs. Add named entries under `[pydrizzle.modes.*]`:
 
 ```toml
 [pydrizzle]
@@ -55,62 +109,12 @@ schema = "src/db/schema"
 schema_type = "typescript"
 ```
 
-For `pydrizzle`, `schema` can point at a single file, a dotted module like `myapp.schemas`, or a package directory. Package targets are imported and walked recursively so split schema modules can stay in subpackages.
+`pydrizzle-orm generate` processes every entry. Use `--mode <name>` to target a single one.
 
-For `sqlalchemy`, `schema` can point at a single file, a dotted module like `myapp.models`, or a package directory. Package targets are imported and walked recursively so models can stay split across submodules.
+For any mode, `schema` can be a file path, a dotted Python module, or a directory — directories are walked recursively.
 
-For `typescript`, `schema` can point at a single `.ts` schema file, an `index.ts` barrel that re-exports schema modules, or a directory of `.ts` schema files. Directory targets are walked recursively so split Drizzle schemas can stay spread across subfolders.
-
-`pydrizzle generate` will walk every configured entry. If multiple entries share the same base `out_dir`, outputs are written into per-entry subdirectories such as `.pydrizzle/native/` and `.pydrizzle/sqlalchemy/`.
-
-Use `--mode native` when you want to target only one named entry.
-
-## Generate Drizzle files
+### JSON logging
 
 ```bash
-pydrizzle-orm generate
-```
-
-Generated output:
-
-- `.pydrizzle/schema.ts`
-- `.pydrizzle/drizzle.config.ts`
-
-With multiple named entries, expect one output folder per entry under the shared base directory unless that entry overrides `out_dir`.
-
-`sqlalchemy` and `typescript` targets are supported for generation the same way as native targets.
-
-## Apply schema directly
-
-```bash
-export DATABASE_URL=postgresql://user:pass@localhost:5432/app
-pydrizzle-orm push
-```
-
-## Create migration files
-
-```bash
-pydrizzle-orm migrate
-```
-
-## Inspect setup
-
-```bash
-pydrizzle-orm status
 pydrizzle-orm --log-format json status
-```
-
-## Minimal schema example
-
-```python
-from pydrizzle_orm.pg import index, pg_table, text, timestamp, uuid
-
-users = pg_table(
-    "users",
-    id=uuid().primary_key().default_random(),
-    email=text().not_null().unique(),
-    name=text().not_null(),
-    created_at=timestamp("created_at").default_now().not_null(),
-    indexes=[index("users_email_idx").on("email")],
-)
 ```
