@@ -1,9 +1,9 @@
-# pydrizzle
+# pydrizzle-orm
 
 **Python migrations powered by Drizzle** — define your database schema in Python, generate and apply migrations using [drizzle-kit](https://orm.drizzle.team/kit-docs/overview) under the hood.
 
-[![CI](https://github.com/ndamulelonemakh/pydrizzle/actions/workflows/ci.yml/badge.svg)](https://github.com/ndamulelonemakh/pydrizzle/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/pydrizzle.svg)](https://pypi.org/project/pydrizzle/)
+[![CI](https://github.com/ndamulelonemakh/pydrizzle-orm/actions/workflows/ci.yml/badge.svg)](https://github.com/ndamulelonemakh/pydrizzle-orm/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/pydrizzle-orm.svg)](https://pypi.org/project/pydrizzle-orm/)
 
 > Migrations-only. Bring your own query layer.
 
@@ -11,7 +11,7 @@
 
 - **Drizzle-kit** has the best migration diffing engine — deterministic, readable SQL output
 - **Alembic** has confusing revision chains, unreliable auto-detect, and complex setup
-- **pydrizzle** bridges the gap: Python schema definition + Drizzle migration engine
+- **pydrizzle-orm** bridges the gap: Python schema definition + Drizzle migration engine
 
 ## Quick Start
 
@@ -22,19 +22,19 @@ Requirements:
 - PostgreSQL database URL exposed as `DATABASE_URL`
 
 ```bash
-uv pip install pydrizzle
-pydrizzle init
-pydrizzle generate
-pydrizzle push
+uv pip install pydrizzle-orm
+pydrizzle-orm init
+pydrizzle-orm generate
+pydrizzle-orm push
 ```
 
 For SQLAlchemy model introspection, install the extra:
 
 ```bash
-uv pip install 'pydrizzle[sqlalchemy]'
+uv pip install 'pydrizzle-orm[sqlalchemy]'
 ```
 
-If you want one config file to describe multiple schema sources, put them under `[pydrizzle.modes.*]`. `pydrizzle generate` will process every configured entry, and `--mode <name>` can be used to target one entry.
+If you want one config file to describe multiple schema sources, put them under `[pydrizzle.modes.*]`. `pydrizzle-orm generate` will process every configured entry, and `--mode <name>` can be used to target one entry.
 
 For a fuller setup walkthrough, see [docs/quickstart.md](docs/quickstart.md).
 
@@ -42,7 +42,7 @@ For a fuller setup walkthrough, see [docs/quickstart.md](docs/quickstart.md).
 
 ```python
 # schema.py
-from pydrizzle import pg_table, pg_schema, text, timestamp, jsonb, uuid, pg_enum, index
+from pydrizzle_orm import pg_table, pg_schema, text, timestamp, jsonb, uuid, pg_enum, index
 
 app = pg_schema("app")
 
@@ -58,14 +58,14 @@ users = pg_table("users", schema=app,
 )
 ```
 
-> Both `from pydrizzle import ...` and `from pydrizzle.pg import ...` work.
+> Both `from pydrizzle_orm import ...` and `from pydrizzle_orm.pg import ...` work.
 > The shorter form is recommended for new projects.
 
 ## Three Schema Input Modes
 
 | Mode | Config `schema_type` | Description |
 |------|---------------------|-------------|
-| **Native DSL** | `pydrizzle` | Define schemas with pydrizzle's Python API |
+| **Native DSL** | `pydrizzle` | Define schemas with pydrizzle-orm's Python API |
 | **SQLAlchemy** | `sqlalchemy` | Introspect existing SQLAlchemy models |
 | **TypeScript** | `typescript` | Use Drizzle `.ts` schemas directly |
 
@@ -123,32 +123,32 @@ For `typescript` targets, `schema` can point at a single `.ts` schema file, an `
 ## CLI
 
 ```bash
-pydrizzle init
-pydrizzle generate
-pydrizzle push
-pydrizzle migrate
-pydrizzle studio
-pydrizzle status
+pydrizzle-orm init
+pydrizzle-orm generate
+pydrizzle-orm push
+pydrizzle-orm migrate
+pydrizzle-orm studio
+pydrizzle-orm status
 ```
 
 Structured logging controls:
 
 ```bash
-pydrizzle --log-level DEBUG generate
-pydrizzle --log-format json status
+pydrizzle-orm --log-level DEBUG generate
+pydrizzle-orm --log-format json status
 ```
 
 Environment-based logging controls:
 
 ```bash
-export PYDRIZZLE_LOG_LEVEL=DEBUG
-export PYDRIZZLE_LOG_FORMAT=json
+export PYDRIZZLE_ORM_LOG_LEVEL=DEBUG
+export PYDRIZZLE_ORM_LOG_FORMAT=json
 ```
 
 Library consumers can also configure logging directly:
 
 ```python
-from pydrizzle import configure_logging
+from pydrizzle_orm import configure_logging
 
 configure_logging(level="INFO", fmt="json")
 ```

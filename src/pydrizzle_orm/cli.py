@@ -256,9 +256,9 @@ users = pg_table(
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="pydrizzle", description="Python migrations powered by Drizzle"
+        prog="pydrizzle-orm", description="Python migrations powered by Drizzle"
     )
-    parser.add_argument("--version", action="version", version=f"pydrizzle {__version__}")
+    parser.add_argument("--version", action="version", version=f"pydrizzle-orm {__version__}")
     parser.add_argument("--config", default="pydrizzle.toml", help="Config file path")
     parser.add_argument(
         "--mode",

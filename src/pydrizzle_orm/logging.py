@@ -7,8 +7,8 @@ import sys
 from datetime import UTC, datetime
 from typing import TextIO
 
-LOG_LEVEL_ENV = "PYDRIZZLE_LOG_LEVEL"
-LOG_FORMAT_ENV = "PYDRIZZLE_LOG_FORMAT"
+LOG_LEVEL_ENV = "PYDRIZZLE_ORM_LOG_LEVEL"
+LOG_FORMAT_ENV = "PYDRIZZLE_ORM_LOG_FORMAT"
 
 _DEFAULT_ATTRS = {
     "args",
@@ -71,7 +71,7 @@ def configure_logging(
     stream: TextIO | None = None,
     force: bool = False,
 ) -> None:
-    logger = logging.getLogger("pydrizzle")
+    logger = logging.getLogger("pydrizzle_orm")
 
     if logger.handlers and not force:
         return
@@ -93,7 +93,7 @@ def configure_logging(
 
 
 def get_logger(name: str | None = None) -> logging.Logger:
-    base = "pydrizzle"
+    base = "pydrizzle_orm"
     if name:
         return logging.getLogger(f"{base}.{name}")
     return logging.getLogger(base)

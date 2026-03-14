@@ -28,10 +28,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/ndamulelonemakh/pydrizzle"
-Repository = "https://github.com/ndamulelonemakh/pydrizzle"
-Issues = "https://github.com/ndamulelonemakh/pydrizzle/issues"
-Documentation = "https://github.com/ndamulelonemakh/pydrizzle/tree/main/docs"
+Homepage = "https://github.com/ndamulelonemakh/pydrizzle-orm"
+Repository = "https://github.com/ndamulelonemakh/pydrizzle-orm"
+Issues = "https://github.com/ndamulelonemakh/pydrizzle-orm/issues"
+Documentation = "https://github.com/ndamulelonemakh/pydrizzle-orm/tree/main/docs"
 
 [project.optional-dependencies]
 sqlalchemy = ["sqlalchemy>=2.0"]

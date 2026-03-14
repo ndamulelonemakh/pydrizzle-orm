@@ -135,7 +135,7 @@ def _load_module_from_file(path: Path) -> ModuleType:
     if not path.exists():
         raise FileNotFoundError(f"Schema file not found: {path}")
 
-    module_name = f"_pydrizzle_sqlalchemy_{path.stem}"
+    module_name = f"_pydrizzle_orm_sqlalchemy_{path.stem}"
     spec = importlib.util.spec_from_file_location(module_name, path)
     if spec is None or spec.loader is None:
         raise ImportError(f"Cannot load module from: {path}")

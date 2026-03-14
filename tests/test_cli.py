@@ -327,7 +327,7 @@ class TestBuildParser:
         parser = build_parser()
         with pytest.raises(SystemExit, match="0"):
             parser.parse_args(["--version"])
-        assert "pydrizzle" in capsys.readouterr().out
+        assert "pydrizzle-orm" in capsys.readouterr().out
 
     def test_requires_subcommand(self) -> None:
         parser = build_parser()

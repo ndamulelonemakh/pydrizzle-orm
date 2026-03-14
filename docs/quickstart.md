@@ -9,25 +9,25 @@
 ## Install
 
 ```bash
-uv pip install pydrizzle
+uv pip install pydrizzle-orm
 ```
 
 If you want to read SQLAlchemy models directly:
 
 ```bash
-uv pip install 'pydrizzle[sqlalchemy]'
+uv pip install 'pydrizzle-orm[sqlalchemy]'
 ```
 
 Or with `pip`:
 
 ```bash
-pip install pydrizzle
+pip install pydrizzle-orm
 ```
 
 ## Bootstrap a project
 
 ```bash
-pydrizzle init
+pydrizzle-orm init
 ```
 
 This creates:
@@ -68,7 +68,7 @@ Use `--mode native` when you want to target only one named entry.
 ## Generate Drizzle files
 
 ```bash
-pydrizzle generate
+pydrizzle-orm generate
 ```
 
 Generated output:
@@ -84,26 +84,26 @@ With multiple named entries, expect one output folder per entry under the shared
 
 ```bash
 export DATABASE_URL=postgresql://user:pass@localhost:5432/app
-pydrizzle push
+pydrizzle-orm push
 ```
 
 ## Create migration files
 
 ```bash
-pydrizzle migrate
+pydrizzle-orm migrate
 ```
 
 ## Inspect setup
 
 ```bash
-pydrizzle status
-pydrizzle --log-format json status
+pydrizzle-orm status
+pydrizzle-orm --log-format json status
 ```
 
 ## Minimal schema example
 
 ```python
-from pydrizzle.pg import index, pg_table, text, timestamp, uuid
+from pydrizzle_orm.pg import index, pg_table, text, timestamp, uuid
 
 users = pg_table(
     "users",

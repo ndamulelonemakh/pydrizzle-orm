@@ -1,4 +1,4 @@
-"""Allow ``python -m pydrizzle`` to invoke the CLI."""
+"""Allow ``python -m pydrizzle_orm`` to invoke the CLI."""
 
 from pydrizzle_orm.cli import main
 

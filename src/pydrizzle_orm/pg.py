@@ -1,4 +1,4 @@
-"""PostgreSQL schema DSL — the native pydrizzle way to define schemas."""
+"""PostgreSQL schema DSL — the native pydrizzle-orm way to define schemas."""
 
 from __future__ import annotations
 

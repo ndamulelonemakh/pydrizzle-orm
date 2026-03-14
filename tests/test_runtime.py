@@ -10,7 +10,7 @@ from pydrizzle_orm.runtime import RuntimeInfo, detect_runtime, run_drizzle_kit
 
 class TestDetectRuntime:
     def test_honors_explicit_runner_override(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        monkeypatch.setenv("PYDRIZZLE_JS_RUNNER", "npx")
+        monkeypatch.setenv("PYDRIZZLE_ORM_JS_RUNNER", "npx")
         with patch("pydrizzle_orm.runtime.shutil.which") as mock_which:
 
             def _which(cmd: str) -> str | None:
@@ -24,9 +24,9 @@ class TestDetectRuntime:
         assert info.runner_path == "/usr/local/bin/npx"
 
     def test_rejects_invalid_runner_override(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        monkeypatch.setenv("PYDRIZZLE_JS_RUNNER", "node")
+        monkeypatch.setenv("PYDRIZZLE_ORM_JS_RUNNER", "node")
 
-        with pytest.raises(RuntimeError, match="Invalid PYDRIZZLE_JS_RUNNER"):
+        with pytest.raises(RuntimeError, match="Invalid PYDRIZZLE_ORM_JS_RUNNER"):
             detect_runtime()
 
     def test_prefers_bunx_when_available(self) -> None:

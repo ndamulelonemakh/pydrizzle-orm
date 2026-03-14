@@ -11,7 +11,7 @@ from pydrizzle_orm.logging import get_logger
 
 JsRunner = Literal["bunx", "npx"]
 logger = get_logger("runtime")
-JS_RUNNER_ENV = "PYDRIZZLE_JS_RUNNER"
+JS_RUNNER_ENV = "PYDRIZZLE_ORM_JS_RUNNER"
 
 
 @dataclass(frozen=True)
@@ -40,7 +40,7 @@ def detect_runtime() -> RuntimeInfo:
 
     raise RuntimeError(
         "No JavaScript runtime found. Install Bun (https://bun.sh) "
-        "or Node.js (https://nodejs.org) to use pydrizzle."
+        "or Node.js (https://nodejs.org) to use pydrizzle-orm."
     )
 
 

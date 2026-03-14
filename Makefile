@@ -29,7 +29,7 @@ test-v:
 	uv run pytest -v
 
 test-cov:
-	uv run pytest --cov=pydrizzle --cov-report=term-missing
+	uv run pytest --cov=pydrizzle_orm --cov-report=term-missing
 
 clean:
 	rm -rf dist/ build/ .eggs/ *.egg-info

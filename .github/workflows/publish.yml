@@ -49,7 +49,7 @@ jobs:
       id-token: write
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/pydrizzle
+      url: https://test.pypi.org/p/pydrizzle-orm
 
     steps:
       - name: Download dist artifacts
@@ -72,7 +72,7 @@ jobs:
       id-token: write
     environment:
       name: pypi
-      url: https://pypi.org/p/pydrizzle
+      url: https://pypi.org/p/pydrizzle-orm
 
     steps:
       - name: Download dist artifacts
